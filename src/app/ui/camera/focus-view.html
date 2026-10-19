@@ -1,0 +1,66 @@
+<dialog #dialog class="modal" aria-labelledby="focus-title" (close)="close()" (click)="onBackdrop($event)">
+  @if (cam(); as cam) {
+    <div class="focus popover">
+      <header class="focus__head">
+        <app-icon name="camera" [size]="18" />
+        <h2 id="focus-title">
+          {{ i18n.lang() === 'ar' ? cam.nameAr : cam.name }}
+          <span class="focus__id mono">{{ cam.id.toUpperCase() }} · {{ i18n.t('focusView') }}</span>
+        </h2>
+        <span class="spacer"></span>
+        <div class="focus__toggles" role="group" [attr.aria-label]="i18n.t('filters')">
+          <button type="button" class="btn btn--sm" [attr.aria-pressed]="heatmap()" (click)="heatmap.set(!heatmap())">
+            {{ i18n.t('heatmap') }}
+          </button>
+          <button type="button" class="btn btn--sm" [attr.aria-pressed]="trails()" (click)="trails.set(!trails())">
+            {{ i18n.t('trails') }}
+          </button>
+          <button type="button" class="btn btn--sm" [attr.aria-pressed]="overlays()" (click)="overlays.set(!overlays())">
+            {{ i18n.t('zones') }}
+          </button>
+        </div>
+        <button type="button" class="btn btn--icon btn--ghost" (click)="close()" [attr.aria-label]="i18n.t('close')" autofocus>
+          <app-icon name="close" [size]="18" />
+        </button>
+      </header>
+      <div class="focus__body">
+        <div class="focus__stage">
+          <app-camera-canvas [cam]="cam" [detail]="true" [heatmap]="heatmap()" [trails]="trails()" [overlays]="overlays()" />
+          @if (heatmap()) {
+            <div class="heat-legend" aria-hidden="true"><span>0</span><i></i><span>max</span></div>
+          }
+        </div>
+        <aside class="focus__side">
+          <h3 class="side__title">{{ i18n.t('tracks') }} <span class="mono">{{ tracks().length }}</span></h3>
+          <ul class="tracks" role="list">
+            @for (t of tracks(); track t.id) {
+              <li class="track">
+                <span class="dot" [style.color]="classColor[t.cls]"></span>
+                <span class="mono track__id">{{ t.id }}</span>
+                <span class="track__cls">{{ i18n.cls(t.cls) }}</span>
+                <span class="conf" [style.--c]="t.conf"><i></i></span>
+                <span class="mono track__pct">{{ (t.conf * 100).toFixed(0) }}%</span>
+              </li>
+            } @empty {
+              <li class="empty">{{ i18n.t('noTracks') }}</li>
+            }
+          </ul>
+          <h3 class="side__title">{{ i18n.t('camAlerts') }}</h3>
+          <ul class="mini-alerts" role="list">
+            @for (a of camAlerts(); track a.id) {
+              <li class="sev" [attr.data-sev]="a.severity">
+                <span class="dot"></span>
+                <span>{{ i18n.alertType(a.alertType) }}</span>
+                <span class="mono">{{ a.trackId }}</span>
+                <span class="spacer"></span>
+                <time class="mono">{{ i18n.time(a.ts) }}</time>
+              </li>
+            } @empty {
+              <li class="empty">-</li>
+            }
+          </ul>
+        </aside>
+      </div>
+    </div>
+  }
+</dialog>

@@ -1,0 +1,59 @@
+:root {
+  color-scheme: dark;
+  // Surfaces
+  --bg-0: #04080d;
+  --bg-1: #08101a;
+  --bg-2: #0d1621;
+  --surface: rgba(15, 24, 35, 0.78);
+  --surface-2: #111c28;
+  --surface-3: #172433;
+  --border: rgba(130, 170, 200, 0.16);
+  --border-strong: rgba(130, 170, 200, 0.32);
+  // Text (all >= 4.5:1 on --bg-1)
+  --text: #e8f0f6;
+  --text-muted: #a9b8c6;
+  --text-dim: #8195a8;
+  // Accents
+  --ember: #ff7a3d;
+  --ember-2: #ffb36b;
+  --ember-ink: #1c0c03;
+  --teal: #2ee6c5;
+  --teal-2: #5cc8ff;
+  --teal-ink: #021a16;
+  // Severity
+  --sev-low: #6cb6ff;
+  --sev-medium: #ffc857;
+  --sev-high: #ff8a4c;
+  --sev-critical: #ff5c7a;
+  // Object classes
+  --cls-person: #2ee6c5;
+  --cls-vehicle: #ffc857;
+  --cls-bag: #c49bff;
+  // Shape & depth
+  --radius-s: 6px;
+  --radius-m: 10px;
+  --radius-l: 16px;
+  --shadow-1: 0 1px 0 rgba(255, 255, 255, 0.04) inset, 0 10px 30px -12px rgba(0, 0, 0, 0.7);
+  --shadow-2: 0 24px 60px -20px rgba(0, 0, 0, 0.85), 0 0 0 1px rgba(130, 170, 200, 0.1);
+  --glow-ember: 0 0 0 1px rgba(255, 122, 61, 0.35), 0 0 24px -4px rgba(255, 122, 61, 0.45);
+  --glow-teal: 0 0 0 1px rgba(46, 230, 197, 0.35), 0 0 24px -6px rgba(46, 230, 197, 0.45);
+  // Type
+  --font-ui: 'Inter', 'Segoe UI Variable', 'Segoe UI', system-ui, -apple-system, 'Noto Sans Arabic', 'Geeza Pro', Tahoma, sans-serif;
+  --font-mono: ui-monospace, 'Cascadia Mono', 'SF Mono', Menlo, Consolas, 'Noto Sans Arabic', monospace;
+  --fs-xs: 0.72rem;
+  --fs-s: 0.8125rem;
+  --fs-m: 0.9375rem;
+  --fs-l: 1.125rem;
+  --fs-xl: 1.6rem;
+  // Motion
+  --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --dur-fast: 140ms;
+  --dur: 260ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --dur-fast: 0ms;
+    --dur: 0ms;
+  }
+}

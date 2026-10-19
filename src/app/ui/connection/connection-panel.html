@@ -1,0 +1,72 @@
+<section class="card conn" aria-labelledby="conn-title">
+  <header class="card__head">
+    <h2 class="card__title" id="conn-title">{{ i18n.t('connection') }}</h2>
+  </header>
+  <div class="card__body">
+    <div class="status" [attr.data-kind]="feed.state().kind" role="status" aria-live="polite">
+      <span class="status__icon">
+        @if (feed.state().kind === 'reconnecting') {
+          <svg viewBox="0 0 36 36" class="ring" aria-hidden="true">
+            <circle cx="18" cy="18" r="15" class="ring__bg" />
+            <circle cx="18" cy="18" r="15" class="ring__fg" [attr.stroke-dasharray]="94.2" [attr.stroke-dashoffset]="94.2 * (1 - backoffProgress())" />
+          </svg>
+        } @else {
+          <span class="live-dot"></span>
+        }
+      </span>
+      <div class="status__text">
+        <strong>{{ statusText() }}</strong>
+        @if (reason()) {
+          <span>{{ reason() }}</span>
+        } @else if (feed.state().kind === 'live') {
+          <span class="mono">{{ config.wsUrl }}</span>
+        }
+      </div>
+    </div>
+
+    <dl class="stats">
+      <div>
+        <dt>{{ i18n.t('rtt') }}</dt>
+        <dd class="mono">{{ feed.rttMs() === null ? '-' : feed.rttMs() + ' ms' }}</dd>
+      </div>
+      <div>
+        <dt>{{ i18n.t('eps') }}</dt>
+        <dd class="mono">{{ feed.eventsPerSec() }}</dd>
+      </div>
+      <div>
+        <dt>{{ i18n.t('protocol') }}</dt>
+        <dd class="mono">v{{ version }} · JSON</dd>
+      </div>
+      <div>
+        <dt>{{ i18n.t('buffer') }}</dt>
+        <dd class="mono">{{ feed.bufferedSeconds() }} s</dd>
+      </div>
+    </dl>
+
+    <app-sparkline class="eps" [values]="feed.epsHistory()" [color]="'var(--teal-2)'" [h]="40" [grid]="true" [label]="i18n.t('eps')" />
+
+    @if (feed.replaying()) {
+      <div class="replay" role="progressbar" [attr.aria-valuenow]="(feed.replayProgress() * 100).toFixed(0)" aria-valuemin="0" aria-valuemax="100" [attr.aria-label]="i18n.t('replay')">
+        <i [style.width.%]="feed.replayProgress() * 100"></i>
+      </div>
+    }
+
+    <div class="actions">
+      <button type="button" class="btn" [attr.aria-pressed]="feed.paused()" (click)="feed.togglePause()">
+        <app-icon [name]="feed.paused() ? 'play' : 'pause'" />{{ feed.paused() ? i18n.t('resume') : i18n.t('pause') }}
+      </button>
+      <button type="button" class="btn" [attr.aria-pressed]="feed.replaying()" (click)="feed.replay()" [disabled]="!feed.bufferedSeconds() && !feed.replaying()">
+        <app-icon name="replay" />{{ feed.replaying() ? i18n.t('stopReplay') : i18n.t('replay') }}
+      </button>
+      @if (feed.state().kind === 'simulated') {
+        <button type="button" class="btn btn--teal" (click)="feed.tryLive()">
+          <app-icon name="wifi" />{{ i18n.t('tryLive') }}
+        </button>
+      } @else {
+        <button type="button" class="btn" (click)="feed.useSimulated()">
+          <app-icon name="cpu" />{{ i18n.t('useSim') }}
+        </button>
+      }
+    </div>
+  </div>
+</section>

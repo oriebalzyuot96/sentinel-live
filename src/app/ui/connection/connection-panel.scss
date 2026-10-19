@@ -1,0 +1,114 @@
+:host {
+  display: block;
+  min-width: 0;
+}
+
+.status {
+  --c: var(--teal);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: var(--radius-m);
+  border: 1px solid color-mix(in srgb, var(--c) 40%, transparent);
+  background: color-mix(in srgb, var(--c) 9%, transparent);
+  color: var(--c);
+
+  &[data-kind='connecting'],
+  &[data-kind='reconnecting'] {
+    --c: var(--sev-medium);
+  }
+  &[data-kind='simulated'] {
+    --c: var(--ember-2);
+  }
+}
+
+.status__icon {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  flex: none;
+}
+
+.ring {
+  width: 28px;
+  height: 28px;
+  transform: rotate(-90deg);
+  circle {
+    fill: none;
+    stroke-width: 3;
+  }
+  .ring__bg {
+    stroke: rgba(130, 170, 200, 0.2);
+  }
+  .ring__fg {
+    stroke: currentColor;
+    stroke-linecap: round;
+    transition: stroke-dashoffset 250ms linear;
+  }
+}
+
+.status__text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  strong {
+    font-size: var(--fs-m);
+  }
+  span {
+    font-size: var(--fs-xs);
+    color: var(--text-muted);
+    overflow-wrap: anywhere;
+  }
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin: 12px 0 8px;
+
+  div {
+    padding: 8px 10px;
+    border-radius: var(--radius-s);
+    background: rgba(130, 170, 200, 0.05);
+    border: 1px solid var(--border);
+    min-width: 0;
+  }
+  dt {
+    font-size: var(--fs-xs);
+    color: var(--text-muted);
+  }
+  dd {
+    margin: 2px 0 0;
+    font-size: var(--fs-m);
+    font-weight: 700;
+    overflow-wrap: anywhere;
+  }
+}
+
+.eps {
+  height: 40px;
+  margin-bottom: 10px;
+}
+
+.replay {
+  height: 6px;
+  border-radius: 3px;
+  background: rgba(130, 170, 200, 0.15);
+  overflow: hidden;
+  margin-bottom: 10px;
+  i {
+    display: block;
+    height: 100%;
+    background: linear-gradient(90deg, var(--ember), var(--ember-2));
+    box-shadow: 0 0 12px var(--ember);
+  }
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}

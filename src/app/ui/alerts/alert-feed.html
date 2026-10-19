@@ -1,0 +1,135 @@
+<section class="card feed" aria-labelledby="feed-title">
+  <header class="card__head">
+    <h2 class="card__title" id="feed-title">{{ i18n.t('alertFeed') }}</h2>
+    <span class="feed__count mono" [attr.aria-label]="unacked() + ' unacknowledged'">{{ unacked() }}</span>
+    <span class="spacer"></span>
+    <button type="button" class="btn btn--sm" (click)="ackAll()" [disabled]="!unacked()">
+      <app-icon name="checks" [size]="14" />{{ i18n.t('ackAll') }}
+    </button>
+    <button type="button" class="btn btn--sm" [attr.aria-pressed]="showFilters()" aria-controls="alert-filters"
+      (click)="showFilters.set(!showFilters())">
+      <app-icon name="filter" [size]="14" />{{ i18n.t('filters') }}
+      @if (activeFilters()) {
+        <span class="pill mono">{{ activeFilters() }}</span>
+      }
+    </button>
+  </header>
+
+  @if (showFilters()) {
+    <div class="filters" id="alert-filters">
+      <fieldset>
+        <legend>{{ i18n.t('severity') }}</legend>
+        <div class="chips">
+          @for (s of severities; track s) {
+            <button type="button" class="chip sev" [attr.data-sev]="s" [style.--chip-color]="'var(--sev)'"
+              [attr.aria-pressed]="store.filter().severities.includes(s)" (click)="toggleSeverity(s)">
+              <span class="dot"></span>{{ i18n.severity(s) }}
+            </button>
+          }
+        </div>
+      </fieldset>
+      <fieldset>
+        <legend>{{ i18n.t('type') }}</legend>
+        <div class="chips">
+          @for (t of types; track t) {
+            <button type="button" class="chip" [attr.aria-pressed]="store.filter().types.includes(t)" (click)="toggleType(t)">
+              {{ i18n.alertType(t) }}
+            </button>
+          }
+        </div>
+      </fieldset>
+      <div class="filters__row">
+        <label class="visually-hidden" for="cam-filter">{{ i18n.t('camera') }}</label>
+        <select id="cam-filter" class="select" [value]="store.filter().cams[0] ?? ''" (change)="setCam($any($event.target).value)">
+          <option value="">{{ i18n.t('allCameras') }}</option>
+          @for (c of store.cameras(); track c.id) {
+            <option [value]="c.id">{{ i18n.lang() === 'ar' ? c.nameAr : c.name }}</option>
+          }
+        </select>
+        <label class="switch">
+          <input type="checkbox" [checked]="store.filter().showAcked" (change)="setShowAcked($any($event.target).checked)" />
+          {{ i18n.t('showAcked') }}
+        </label>
+        <label class="switch">
+          <input type="checkbox" [checked]="!!store.filter().assignedTo" (change)="setMine($any($event.target).checked)" />
+          {{ i18n.t('mineOnly') }}
+        </label>
+      </div>
+      @if (store.alertsState().muted.length) {
+        <div class="muted-rules">
+          <span class="muted-rules__title">{{ i18n.t('muted') }}</span>
+          @for (k of store.alertsState().muted; track k) {
+            <button type="button" class="chip" (click)="unmute(k)" [attr.aria-label]="i18n.t('unmute') + ': ' + muteLabel(k)">
+              <app-icon name="muteRule" [size]="12" />{{ muteLabel(k) }}<app-icon name="close" [size]="12" />
+            </button>
+          }
+        </div>
+      }
+    </div>
+  }
+
+  <ol class="list" role="list" [attr.aria-label]="i18n.t('alertFeed')">
+    @for (a of items(); track a.id) {
+      <li class="alert sev" [attr.data-sev]="a.severity" [class.alert--acked]="!!a.ackedBy">
+        <div class="alert__main">
+          <div class="alert__top">
+            <span class="alert__sev"><span class="dot"></span>{{ i18n.severity(a.severity) }}</span>
+            <strong class="alert__type">{{ i18n.alertType(a.alertType) }}</strong>
+            <span class="spacer"></span>
+            <time class="mono alert__time" [attr.datetime]="a.ts">{{ i18n.time(a.ts) }}</time>
+          </div>
+          <div class="alert__meta">
+            <span>{{ camName(a.cam) }}</span>
+            <span class="mono">{{ i18n.t('track') }} {{ a.trackId }}</span>
+            @if (a.zone) {
+              <span>{{ a.zone }}</span>
+            }
+          </div>
+          @if (a.assignee || a.ackedBy) {
+            <div class="alert__flow">
+              @if (a.assignee) {
+                <span class="flow flow--assign"><app-icon name="assign" [size]="12" />{{ i18n.t('assignedTo', { name: chat.nameOf(a.assignee) }) }}</span>
+              }
+              @if (a.ackedBy) {
+                <span class="flow flow--ack"><app-icon name="check" [size]="12" />{{ i18n.t('ackedBy', { name: chat.nameOf(a.ackedBy) }) }}</span>
+              }
+            </div>
+          }
+        </div>
+        <div class="alert__actions">
+          @if (!a.ackedBy) {
+            <button type="button" class="btn btn--sm btn--teal" (click)="ack(a)" [attr.aria-label]="i18n.t('ack') + ': ' + i18n.alertType(a.alertType) + ', ' + camName(a.cam)">
+              <app-icon name="check" [size]="14" /><span class="lbl">{{ i18n.t('ack') }}</span>
+            </button>
+          }
+          <div class="assign">
+            <button type="button" class="btn btn--sm" [attr.aria-expanded]="assignMenu() === a.id" [disabled]="!assignees().length"
+              (click)="assignMenu.set(assignMenu() === a.id ? null : a.id)" [attr.aria-label]="i18n.t('assign')">
+              <app-icon name="assign" [size]="14" /><span class="lbl">{{ i18n.t('assign') }}</span>
+            </button>
+            @if (assignMenu() === a.id) {
+              <div class="assign__menu popover" role="menu">
+                @for (o of assignees(); track o.id) {
+                  <button type="button" role="menuitem" class="assign__item" (click)="assign(a, o.id)">
+                    <span class="dot" [attr.data-status]="o.status"></span>{{ i18n.t('assignTo', { name: o.name }) }}
+                  </button>
+                }
+              </div>
+            }
+          </div>
+          <button type="button" class="btn btn--sm btn--icon" (click)="discuss(a)" [attr.aria-label]="i18n.t('discuss')" [attr.title]="i18n.t('discuss')">
+            <app-icon name="chat" [size]="14" />
+            @if (roomUnread(a)) {
+              <span class="count-badge">{{ roomUnread(a) }}</span>
+            }
+          </button>
+          <button type="button" class="btn btn--sm btn--icon" (click)="mute(a)" [attr.aria-label]="i18n.t('mute')" [attr.title]="i18n.t('mute')">
+            <app-icon name="muteRule" [size]="14" />
+          </button>
+        </div>
+      </li>
+    } @empty {
+      <li class="empty">{{ i18n.t('noAlerts') }}</li>
+    }
+  </ol>
+</section>

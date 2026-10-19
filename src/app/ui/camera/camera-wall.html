@@ -1,0 +1,42 @@
+<section class="card wall" aria-labelledby="wall-title" id="camera-wall" tabindex="-1">
+  <header class="card__head">
+    <h2 class="card__title" id="wall-title">{{ i18n.t('cameraWall') }}</h2>
+    <span class="spacer"></span>
+    <span class="legend" aria-hidden="true">
+      @for (c of classes; track c) {
+        <span class="legend__item" [attr.data-cls]="c"><span class="dot"></span>{{ i18n.cls(c) }}</span>
+      }
+    </span>
+  </header>
+  <div class="card__body">
+    <ul class="grid" role="list">
+      @for (cam of store.cameras(); track cam.id) {
+        @let alert = freshAlerts()[cam.id];
+        @let counts = store.camCounts()[cam.id];
+        <li class="tile" [class.tile--alert]="!!alert" [attr.data-sev]="alert?.severity">
+          <button type="button" class="tile__btn" (click)="open(cam)" [attr.aria-label]="label(cam)">
+            <app-camera-canvas [cam]="cam" />
+            <span class="tile__expand" aria-hidden="true"><app-icon name="expand" /></span>
+            @if (alert) {
+              <span class="tile__alert sev" [attr.data-sev]="alert.severity">
+                <app-icon name="alert" [size]="14" />{{ i18n.alertType(alert.alertType) }} · {{ alert.trackId }}
+              </span>
+            }
+          </button>
+          <div class="tile__meta">
+            <span class="tile__name">{{ camName(cam) }}</span>
+            <span class="tile__counts mono">
+              @for (c of classes; track c) {
+                <span [attr.data-cls]="c" [attr.title]="i18n.cls(c)"><span class="dot"></span>{{ counts?.[c] ?? 0 }}</span>
+              }
+            </span>
+          </div>
+        </li>
+      } @empty {
+        @for (i of [1, 2, 3, 4, 5, 6]; track i) {
+          <li class="tile tile--skeleton" aria-hidden="true"><div class="skeleton"></div></li>
+        }
+      }
+    </ul>
+  </div>
+</section>

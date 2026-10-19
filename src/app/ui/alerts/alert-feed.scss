@@ -1,0 +1,237 @@
+:host {
+  display: block;
+  min-width: 0;
+  height: 100%;
+}
+
+.feed {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+}
+
+.feed__count {
+  min-width: 26px;
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: rgba(255, 92, 122, 0.16);
+  color: var(--sev-critical);
+  font-size: var(--fs-xs);
+  font-weight: 800;
+  text-align: center;
+}
+
+.pill {
+  padding: 0 6px;
+  border-radius: 999px;
+  background: var(--teal);
+  color: var(--teal-ink);
+  font-size: 0.66rem;
+}
+
+.filters {
+  margin: 0 12px 10px;
+  padding: 10px 12px;
+  border-radius: var(--radius-m);
+  border: 1px solid var(--border);
+  background: rgba(4, 8, 13, 0.45);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+
+  fieldset {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    min-width: 0;
+  }
+  legend {
+    padding: 0;
+    margin-bottom: 6px;
+    font-size: var(--fs-xs);
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+}
+
+.chips,
+.filters__row,
+.muted-rules {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+}
+
+.filters__row {
+  gap: 12px;
+}
+
+.muted-rules__title {
+  font-size: var(--fs-xs);
+  color: var(--text-muted);
+}
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0 12px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  flex: 1;
+  min-height: 0;
+}
+
+.alert {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px 12px;
+  padding-inline-start: 16px;
+  border-radius: var(--radius-m);
+  background: linear-gradient(90deg, color-mix(in srgb, var(--sev) 12%, transparent), rgba(13, 22, 33, 0.7) 45%);
+  border: 1px solid color-mix(in srgb, var(--sev) 28%, transparent);
+  color: var(--text);
+  animation: slide-in var(--dur) var(--ease-out);
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset-block: 8px;
+    inset-inline-start: 6px;
+    width: 3px;
+    border-radius: 2px;
+    background: var(--sev);
+    box-shadow: 0 0 10px var(--sev);
+  }
+}
+
+:root[dir='rtl'] .alert {
+  background: linear-gradient(270deg, color-mix(in srgb, var(--sev) 12%, transparent), rgba(13, 22, 33, 0.7) 45%);
+}
+
+.alert--acked {
+  opacity: 0.62;
+  &::before {
+    box-shadow: none;
+  }
+}
+
+.alert__top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.alert__sev {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--sev);
+  font-size: var(--fs-xs);
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.alert__type {
+  font-size: var(--fs-m);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.alert__time {
+  font-size: var(--fs-xs);
+  color: var(--text-muted);
+}
+
+.alert__meta,
+.alert__flow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+  font-size: var(--fs-xs);
+  color: var(--text-muted);
+}
+
+.flow {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-weight: 600;
+}
+.flow--assign {
+  color: var(--teal-2);
+}
+.flow--ack {
+  color: var(--teal);
+}
+
+.alert__actions {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.assign {
+  position: relative;
+}
+
+.assign__menu {
+  position: absolute;
+  z-index: 20;
+  inset-block-start: calc(100% + 4px);
+  inset-inline-start: 0;
+  min-width: 190px;
+  padding: 4px;
+  display: flex;
+  flex-direction: column;
+}
+
+.assign__item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border: 0;
+  border-radius: var(--radius-s);
+  background: none;
+  text-align: start;
+  font-size: var(--fs-s);
+  cursor: pointer;
+  &:hover,
+  &:focus-visible {
+    background: rgba(46, 230, 197, 0.12);
+  }
+  .dot {
+    color: var(--text-dim);
+    &[data-status='online'] {
+      color: var(--teal);
+    }
+    &[data-status='away'] {
+      color: var(--sev-medium);
+    }
+  }
+}
+
+.empty {
+  padding: 24px 8px;
+  text-align: center;
+  color: var(--text-dim);
+  font-size: var(--fs-s);
+}
+
+@container (max-width: 340px) {
+  .lbl {
+    display: none;
+  }
+}

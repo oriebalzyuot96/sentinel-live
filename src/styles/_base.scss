@@ -1,0 +1,122 @@
+@use 'mixins' as *;
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+  background: var(--bg-1);
+  color: var(--text);
+  font-family: var(--font-ui);
+  font-size: 15px;
+  line-height: 1.45;
+  overflow-x: hidden;
+}
+
+body {
+  min-height: 100dvh;
+  background:
+    radial-gradient(1200px 600px at 85% -10%, rgba(255, 122, 61, 0.1), transparent 60%),
+    radial-gradient(900px 600px at -10% 10%, rgba(46, 230, 197, 0.08), transparent 60%),
+    linear-gradient(var(--bg-1), var(--bg-0));
+  background-attachment: fixed;
+
+  // Control-room grid.
+  &::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    background-image:
+      linear-gradient(rgba(130, 170, 200, 0.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(130, 170, 200, 0.05) 1px, transparent 1px);
+    background-size: 32px 32px;
+    mask-image: radial-gradient(ellipse at 50% 0%, #000 30%, transparent 80%);
+    -webkit-mask-image: radial-gradient(ellipse at 50% 0%, #000 30%, transparent 80%);
+  }
+}
+
+h1,
+h2,
+h3,
+h4 {
+  margin: 0;
+  font-weight: 650;
+  letter-spacing: 0.01em;
+}
+
+p {
+  margin: 0;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+a {
+  color: var(--teal);
+}
+
+:focus-visible {
+  @include focus-ring;
+}
+
+::selection {
+  background: rgba(46, 230, 197, 0.35);
+}
+
+.visually-hidden {
+  @include visually-hidden;
+}
+
+.mono {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+.skip-link {
+  position: absolute;
+  inset-inline-start: 12px;
+  top: -60px;
+  z-index: 1000;
+  padding: 10px 14px;
+  border-radius: var(--radius-m);
+  background: var(--teal);
+  color: var(--teal-ink);
+  font-weight: 700;
+  text-decoration: none;
+  &:focus {
+    top: 12px;
+  }
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(130, 170, 200, 0.3) transparent;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}

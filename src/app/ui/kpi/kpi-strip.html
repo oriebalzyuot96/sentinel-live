@@ -1,0 +1,17 @@
+<ul class="kpis" role="list">
+  @for (d of defs; track d.key) {
+    <li class="kpi card" [attr.data-tone]="d.tone">
+      <div class="kpi__top">
+        <span class="kpi__icon"><app-icon [name]="d.icon" [size]="16" /></span>
+        <span class="kpi__label">{{ i18n.t(d.label) }}</span>
+      </div>
+      <div class="kpi__value">
+        <app-counter [value]="store.kpis()[d.key]" [digits]="d.digits" />
+        @if (d.unit) {
+          <span class="kpi__unit">{{ d.unit }}</span>
+        }
+      </div>
+      <app-sparkline class="kpi__spark" [values]="history()[d.key]" [capacity]="40" [h]="26" [color]="'var(--tone)'" />
+    </li>
+  }
+</ul>

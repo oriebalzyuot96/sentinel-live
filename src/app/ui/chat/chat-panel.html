@@ -1,0 +1,101 @@
+<aside class="chat" [attr.data-mode]="chat.dock()" aria-labelledby="chat-title">
+  <header class="chat__head">
+    <div class="chat__title">
+      <h2 id="chat-title"><app-icon name="chat" [size]="16" />{{ i18n.t('chat') }}</h2>
+      <div class="presence">
+        @for (o of chat.others(); track o.id) {
+          <span class="presence__item" [attr.data-status]="o.status" [attr.title]="i18n.t(presenceKey(o.status))">
+            <span class="dot"></span>{{ o.name }}
+            <span class="visually-hidden">{{ i18n.t(presenceKey(o.status)) }}</span>
+          </span>
+        }
+        @if (chat.simulatedPeer()) {
+          <span class="badge badge--sim">{{ i18n.t('simulatedOperator') }}</span>
+        }
+      </div>
+    </div>
+    <button type="button" class="me" (click)="chooseOperator()" [attr.aria-label]="i18n.t('chooseOperator')">
+      <app-icon name="user" [size]="14" />{{ chat.me()?.name ?? '…' }}
+    </button>
+    <button type="button" class="btn btn--icon btn--ghost dock-toggle" (click)="toggleDock()"
+      [attr.aria-label]="chat.dock() === 'docked' ? i18n.t('undock') : i18n.t('dock')" [attr.title]="chat.dock() === 'docked' ? i18n.t('undock') : i18n.t('dock')">
+      <app-icon [name]="chat.dock() === 'docked' ? 'float' : 'dock'" [size]="16" />
+    </button>
+    <button type="button" class="btn btn--icon btn--ghost" (click)="close()" [attr.aria-label]="i18n.t('close')">
+      <app-icon name="close" [size]="16" />
+    </button>
+  </header>
+
+  <nav class="rooms" [attr.aria-label]="i18n.t('rooms')">
+    @for (r of chat.rooms(); track r.id) {
+      <button type="button" class="room" [attr.aria-current]="r.id === chat.state().active ? 'true' : null" (click)="openRoom(r.id)">
+        <span class="room__title">{{ roomTitle(r) }}</span>
+        @if (r.unread) {
+          <span class="room__unread mono" [attr.aria-label]="r.unread + ' unread'">{{ r.unread }}</span>
+        }
+      </button>
+    }
+  </nav>
+
+  <div class="messages" #scroller role="log" aria-live="polite" aria-relevant="additions" [attr.aria-label]="roomTitle(chat.activeRoom()!)">
+    @if (canLoadOlder()) {
+      <button type="button" class="btn btn--sm older" (click)="chat.loadHistory(chat.state().active, true)">{{ i18n.t('loadOlder') }}</button>
+    }
+    @for (m of messages(); track m.id) {
+      <div class="msg" [class.msg--mine]="m.mine" [class.msg--mention]="isMention(m)" [attr.data-status]="m.status">
+        @if (!m.mine) {
+          <span class="msg__from">{{ m.fromName }}</span>
+        }
+        <p class="msg__text" dir="auto">{{ m.text }}</p>
+        <span class="msg__meta">
+          <time class="mono" [attr.datetime]="m.ts">{{ i18n.time(m.ts) }}</time>
+          @if (m.mine) {
+            <span class="ticks" [attr.data-status]="m.status" [attr.title]="i18n.t(statusKey(m.status))">
+              @switch (m.status) {
+                @case ('pending') { <span class="clock" aria-hidden="true">◷</span> }
+                @case ('failed') { <app-icon name="alert" [size]="12" /> }
+                @case ('sent') { <app-icon name="check" [size]="13" /> }
+                @default { <app-icon name="checks" [size]="14" /> }
+              }
+              <span class="visually-hidden">{{ i18n.t(statusKey(m.status)) }}</span>
+            </span>
+            @if (m.status === 'failed') {
+              <button type="button" class="retry" (click)="chat.retry(m.id)">{{ i18n.t('retry') }}</button>
+            }
+          }
+        </span>
+      </div>
+    } @empty {
+      <p class="empty">{{ i18n.t('noMessages') }}<br /><small>{{ i18n.t('operatorHint') }}</small></p>
+    }
+  </div>
+
+  <div class="typing" aria-live="polite">
+    @if (chat.typingNames().length) {
+      <span class="typing__dots" aria-hidden="true"><i></i><i></i><i></i></span>
+      {{ i18n.t('isTyping', { name: chat.typingNames().join(', ') }) }}
+    }
+  </div>
+
+  <form class="composer" (submit)="$event.preventDefault(); send()">
+    <div class="emoji">
+      <button type="button" class="btn btn--icon btn--ghost" [attr.aria-expanded]="emojiOpen()" aria-controls="emoji-grid"
+        [attr.aria-label]="i18n.t('emoji')" (click)="emojiOpen.set(!emojiOpen())">
+        <app-icon name="smile" [size]="18" />
+      </button>
+      @if (emojiOpen()) {
+        <div class="emoji__grid popover" id="emoji-grid" role="group" [attr.aria-label]="i18n.t('emoji')">
+          @for (e of emoji; track e) {
+            <button type="button" (click)="insertEmoji(e)" [attr.aria-label]="e">{{ e }}</button>
+          }
+        </div>
+      }
+    </div>
+    <label class="visually-hidden" for="chat-input">{{ i18n.t('typeMessage') }}</label>
+    <textarea id="chat-input" #input class="input composer__input" rows="1" dir="auto" [attr.maxlength]="maxLen"
+      [placeholder]="i18n.t('typeMessage')" [value]="draft()" (input)="onInput($any($event.target).value)" (keydown)="onKeydown($event)"></textarea>
+    <button type="submit" class="btn btn--primary btn--icon" [disabled]="!draft().trim()" [attr.aria-label]="i18n.t('send')">
+      <app-icon name="send" [size]="16" />
+    </button>
+  </form>
+</aside>

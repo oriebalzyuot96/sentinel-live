@@ -1,0 +1,139 @@
+:host {
+  display: block;
+  min-width: 0;
+  container-type: inline-size;
+}
+
+.analytics {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: minmax(0, 1fr);
+}
+
+@container (min-width: 720px) {
+  .analytics {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+  .chart--wide {
+    grid-column: 1 / -1;
+  }
+}
+
+.classes {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.class-row {
+  display: grid;
+  grid-template-columns: 84px minmax(0, 1fr) 36px;
+  align-items: center;
+  gap: 10px;
+}
+
+.class-row__label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--fs-s);
+  color: var(--text-muted);
+  .dot {
+    color: var(--tone);
+  }
+}
+
+.class-row__spark {
+  height: 36px;
+}
+
+.class-row__value {
+  font-size: var(--fs-m);
+  font-weight: 700;
+  text-align: end;
+  color: var(--tone);
+}
+
+.axis {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.66rem;
+  color: var(--text-dim);
+  direction: ltr;
+  margin-top: 4px;
+}
+
+.classes .axis {
+  margin-inline-start: 94px;
+  margin-inline-end: 46px;
+}
+
+.sev-legend {
+  display: inline-flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  font-size: var(--fs-xs);
+  > span {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+}
+
+.timeline {
+  display: block;
+  width: 100%;
+  height: 120px;
+  direction: ltr;
+  .grid {
+    stroke: rgba(130, 170, 200, 0.12);
+    stroke-dasharray: 2 4;
+  }
+  .base {
+    fill: rgba(130, 170, 200, 0.18);
+  }
+}
+
+.heat {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  direction: ltr;
+}
+
+.heat__row {
+  display: grid;
+  grid-template-columns: minmax(70px, 120px) minmax(0, 1fr) 28px;
+  align-items: center;
+  gap: 10px;
+}
+
+:root[dir='rtl'] .heat__cam {
+  direction: rtl;
+  text-align: start;
+}
+
+.heat__cam {
+  font-size: var(--fs-xs);
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.heat__cells {
+  display: block;
+  width: 100%;
+  height: 16px;
+}
+
+.heat__val {
+  font-size: var(--fs-s);
+  font-weight: 700;
+  text-align: end;
+}
+
+.heat__axis {
+  margin-inline-start: 130px;
+  margin-inline-end: 38px;
+}

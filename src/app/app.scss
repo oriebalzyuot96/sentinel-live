@@ -1,0 +1,220 @@
+@use 'mixins' as *;
+
+:host {
+  display: block;
+  position: relative;
+  z-index: 1;
+}
+
+.shell {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  min-height: 100dvh;
+}
+
+@include up($bp-lg) {
+  .shell[data-chat='docked'] {
+    grid-template-columns: minmax(0, 1fr) 380px;
+  }
+}
+
+.main-col {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+// Top bar ---------------------------------------------------------------------
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  gap: 10px 16px;
+  flex-wrap: wrap;
+  padding: 10px 20px;
+  background: linear-gradient(180deg, rgba(6, 11, 18, 0.92), rgba(6, 11, 18, 0.75));
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--border);
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset: auto 0 -1px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255, 122, 61, 0.6), rgba(46, 230, 197, 0.6), transparent);
+  }
+  @include down($bp-sm) {
+    padding: 8px 12px;
+  }
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.brand__logo {
+  width: 36px;
+  height: 36px;
+  flex: none;
+  .sweep {
+    transform-origin: 20px 20px;
+    animation: sweep 4s linear infinite;
+  }
+}
+
+@keyframes sweep {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.brand__text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.1;
+  min-width: 0;
+}
+
+.brand__name {
+  font-weight: 800;
+  font-size: 1.05rem;
+  letter-spacing: 0.18em;
+  direction: ltr;
+  span {
+    color: var(--ember);
+    padding: 0 2px;
+  }
+}
+
+.brand__tag {
+  font-size: var(--fs-xs);
+  color: var(--text-muted);
+}
+
+.status-cluster {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  flex: 1;
+  min-width: 0;
+}
+
+.conn-pill {
+  --c: var(--teal);
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  color: var(--c);
+  border: 1px solid color-mix(in srgb, var(--c) 45%, transparent);
+  background: color-mix(in srgb, var(--c) 10%, transparent);
+  white-space: nowrap;
+  &[data-kind='connecting'],
+  &[data-kind='reconnecting'] {
+    --c: var(--sev-medium);
+  }
+  &[data-kind='simulated'] {
+    --c: var(--ember-2);
+  }
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-inline-start: auto;
+}
+
+.lang {
+  font-family: var(--font-ui);
+  @include down($bp-sm) {
+    padding-inline: 8px;
+  }
+}
+
+// Dashboard --------------------------------------------------------------------
+.main {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 16px 20px 24px;
+  container: main / inline-size;
+  min-width: 0;
+  @include down($bp-sm) {
+    padding: 12px 12px 20px;
+    gap: 12px;
+  }
+}
+
+.dash {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-areas: 'wall' 'alerts' 'analytics' 'conn';
+  min-width: 0;
+  @include down($bp-sm) {
+    gap: 12px;
+  }
+}
+
+@container main (min-width: 980px) {
+  .dash {
+    grid-template-columns: minmax(0, 1fr) 360px;
+    grid-template-areas:
+      'wall alerts'
+      'analytics conn';
+  }
+  .area-alerts {
+    height: auto;
+    min-height: 480px;
+  }
+}
+
+.area-wall {
+  grid-area: wall;
+}
+.area-analytics {
+  grid-area: analytics;
+}
+.area-conn {
+  grid-area: conn;
+  align-self: start;
+}
+
+// The alert column takes the wall's height and scrolls inside.
+.area-alerts {
+  grid-area: alerts;
+  position: relative;
+  height: 520px;
+  min-width: 0;
+  app-alert-feed {
+    position: absolute;
+    inset: 0;
+  }
+}
+
+.footer {
+  margin-top: auto;
+  padding: 18px 20px 28px;
+  border-top: 1px solid var(--border);
+  color: var(--text-dim);
+  font-size: var(--fs-xs);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 6px 20px;
+}
+
+.footer__by {
+  color: var(--text-muted);
+}

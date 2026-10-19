@@ -1,0 +1,71 @@
+<section class="analytics" [attr.aria-label]="i18n.t('analytics')">
+  <article class="card chart">
+    <header class="card__head">
+      <h2 class="card__title">{{ i18n.t('perClass') }}</h2>
+    </header>
+    <div class="card__body classes">
+      @for (c of classes; track c) {
+        @let series = store.classSeries()[c];
+        <div class="class-row" [style.--tone]="classVar[c]">
+          <span class="class-row__label"><span class="dot"></span>{{ i18n.cls(c) }}</span>
+          <app-sparkline class="class-row__spark" [values]="series" [color]="classVar[c]" [h]="36" [grid]="true"
+            [label]="i18n.cls(c) + ': ' + latest(series)" />
+          <span class="class-row__value mono">{{ latest(series) }}</span>
+        </div>
+      }
+      <div class="axis mono" aria-hidden="true"><span>-60 s</span><span>-30 s</span><span>{{ i18n.t('now') }}</span></div>
+    </div>
+  </article>
+
+  <article class="card chart">
+    <header class="card__head">
+      <h2 class="card__title">{{ i18n.t('alertsTimeline') }}</h2>
+      <span class="spacer"></span>
+      <span class="sev-legend" aria-hidden="true">
+        @for (s of severities; track s) {
+          <span class="sev" [attr.data-sev]="s"><span class="dot"></span>{{ i18n.severity(s) }}</span>
+        }
+      </span>
+    </header>
+    <div class="card__body">
+      <svg class="timeline" [attr.viewBox]="'0 0 ' + tlW + ' ' + tlH" preserveAspectRatio="none" role="img" [attr.aria-label]="timelineLabel()">
+        @for (y of [0.25, 0.5, 0.75]; track y) {
+          <line x1="0" [attr.x2]="tlW" [attr.y1]="tlH * y" [attr.y2]="tlH * y" class="grid" vector-effect="non-scaling-stroke" />
+        }
+        @for (b of timeline().bars; track $index) {
+          <rect [attr.x]="b.x" [attr.y]="tlH - 1" [attr.width]="barW" height="1" class="base" />
+          @for (s of b.segments; track s.sev) {
+            <rect [attr.x]="b.x" [attr.y]="s.y" [attr.width]="barW" [attr.height]="s.h" rx="1.5" [style.fill]="sevVar[s.sev]">
+              <title>{{ i18n.severity(s.sev) }}</title>
+            </rect>
+          }
+        }
+      </svg>
+      <div class="axis mono" aria-hidden="true">
+        <span>{{ i18n.t('minAgo', { n: 5 }) }}</span><span>{{ i18n.t('minAgo', { n: 2.5 }) }}</span><span>{{ i18n.t('now') }}</span>
+      </div>
+    </div>
+  </article>
+
+  <article class="card chart chart--wide">
+    <header class="card__head">
+      <h2 class="card__title">{{ i18n.t('occupancy') }}</h2>
+    </header>
+    <div class="card__body">
+      <div class="heat" role="img" [attr.aria-label]="i18n.t('occupancy')">
+        @for (row of heat(); track row.cam.id) {
+          <div class="heat__row">
+            <span class="heat__cam">{{ i18n.lang() === 'ar' ? row.cam.nameAr : row.cam.name }}</span>
+            <svg class="heat__cells" [attr.viewBox]="'0 0 ' + heatCols * cell + ' ' + cell" preserveAspectRatio="none" aria-hidden="true">
+              @for (c of row.cells; track $index) {
+                <rect [attr.x]="$index * cell + 1" y="1" [attr.width]="cell - 2" [attr.height]="cell - 2" rx="2" [style.fill]="heatColor(c.t)" />
+              }
+            </svg>
+            <span class="heat__val mono">{{ row.last }}</span>
+          </div>
+        }
+        <div class="axis mono heat__axis" aria-hidden="true"><span>-60 s</span><span>-30 s</span><span>{{ i18n.t('now') }}</span></div>
+      </div>
+    </div>
+  </article>
+</section>

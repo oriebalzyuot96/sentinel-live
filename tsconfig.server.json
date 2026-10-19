@@ -1,0 +1,13 @@
+/* Type-check the Node server + shared protocol (bundled with esbuild). */
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "types": ["node"],
+    "lib": ["es2022"],
+    "module": "preserve",
+    "moduleResolution": "bundler"
+  },
+  "include": ["server/**/*.ts", "src/shared/**/*.ts"],
+  "exclude": ["src/**/*.spec.ts"]
+}
