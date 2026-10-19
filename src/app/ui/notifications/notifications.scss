@@ -173,3 +173,14 @@
     border-inline-start-color: var(--ember);
   }
 }
+
+// Keep toasts clear of the docked chat column.
+@include up($bp-lg) {
+  :host-context(:root[data-chat='docked']) .toasts {
+    inset-inline-end: 396px;
+  }
+}
+
+.toasts[hidden] {
+  display: none;
+}

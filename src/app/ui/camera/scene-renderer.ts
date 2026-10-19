@@ -467,6 +467,10 @@ function drawZones(ctx: Ctx, cam: CameraInfo, w: number, h: number, detail: bool
 
 function label(ctx: Ctx, text: string, x: number, y: number, color: string, fs: number) {
   const tw = ctx.measureText(text).width;
+  // Keep chips inside the frame.
+  const cw = ctx.canvas.width;
+  x = Math.max(3, Math.min(x, cw - tw - 4));
+  y = Math.max(fs + 1, y);
   ctx.fillStyle = 'rgba(4,9,14,0.78)';
   ctx.fillRect(x - 3, y - fs, tw + 6, fs + 4);
   ctx.fillStyle = color;
@@ -619,8 +623,9 @@ export function drawScene(ctx: CanvasRenderingContext2D, w: number, h: number, c
   // OSD.
   const ofs = opts.detail ? 13 : 10;
   ctx.font = `700 ${ofs}px ${MONO}`;
-  label(ctx, `${cam.id.toUpperCase()} · ${cam.name.toUpperCase()}`, 8, ofs + 8, '#e6eef5', ofs);
-  const clock = opts.clock;
+  label(ctx, w < 420 ? cam.id.toUpperCase() : `${cam.id.toUpperCase()} · ${cam.name.toUpperCase()}`, 8, ofs + 8, '#e6eef5', ofs);
+  // Narrow tiles: time only, so the camera name and clock never collide.
+  const clock = w < 640 ? opts.clock.slice(-8) : opts.clock;
   const tw = ctx.measureText(clock).width;
   label(ctx, clock, w - tw - 10, ofs + 8, '#e6eef5', ofs);
   const blink = opts.reducedMotion || Math.floor(now / 600) % 2 === 0;

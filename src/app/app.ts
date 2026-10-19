@@ -63,6 +63,7 @@ export class App {
     inject(WorkflowService).start();
     this.feed.start();
 
+    effect(() => (document.documentElement.dataset['chat'] = this.chat.dock()));
     // Clicking a toast / notification jumps to the relevant chat room.
     effect(() => {
       const n = this.notifications.activated();

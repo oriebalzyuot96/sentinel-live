@@ -128,6 +128,13 @@
   }
 }
 
+@include down($bp-md) {
+  .status-cluster {
+    order: 3;
+    flex-basis: 100%;
+  }
+}
+
 .actions {
   display: flex;
   align-items: center;

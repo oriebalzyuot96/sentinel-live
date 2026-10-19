@@ -75,7 +75,7 @@ export class NotificationBell {
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [Icon],
   template: `
-    <div class="toasts" role="status" aria-live="polite">
+    <div class="toasts" role="status" aria-live="polite" [hidden]="ui.notificationsOpen()">
       @for (t of n.toasts(); track t.id) {
         <div class="toast" [attr.data-kind]="t.kind">
           <button type="button" class="toast__body" (click)="n.activate(t)">
@@ -93,6 +93,7 @@ export class NotificationBell {
 })
 export class Toasts {
   protected readonly n = inject(NotificationService);
+  protected readonly ui = inject(UiState);
   protected readonly i18n = inject(I18n);
   protected readonly icon = KIND_ICON;
 }

@@ -29,8 +29,11 @@ export class ConnectionPanel {
         return this.i18n.t('stConnecting');
       case 'live':
         return this.i18n.t('stLive');
-      case 'reconnecting':
-        return this.i18n.t('stReconnecting', { s: Math.max(0, Math.ceil((s.retryAt - this.now()) / 1000)), n: s.attempt });
+      case 'reconnecting': {
+        const left = Math.ceil((s.retryAt - this.now()) / 1000);
+        // Countdown while waiting; once it elapses the attempt itself is in flight.
+        return left > 0 ? this.i18n.t('stReconnecting', { s: left, n: s.attempt }) : `${this.i18n.t('stConnecting')} (${s.attempt})`;
+      }
       case 'simulated':
         return this.i18n.t('stSimulated');
     }

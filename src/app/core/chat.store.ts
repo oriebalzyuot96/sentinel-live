@@ -294,9 +294,10 @@ export class ChatStore {
         if (known || !me || m.from === me.id) return;
         this.receiptIn.next({ room: m.room, upTo: m.ts });
         const focused = before.viewing && before.active === m.room;
+        if (focused) return;
         if (mentions(m.text, me)) {
           this.notifications.notify({ kind: 'mention', title: this.i18n.t('nMention', { by: m.fromName }), body: m.text, room: m.room });
-        } else if (!focused) {
+        } else {
           this.notifications.notify({ kind: 'message', title: this.i18n.t('nMessage', { by: m.fromName }), body: m.text, room: m.room });
         }
         return;

@@ -22,7 +22,7 @@ import { drawScene } from './scene-renderer';
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `<canvas #canvas aria-hidden="true"></canvas>`,
   styles: `
-    :host { display: block; position: relative; aspect-ratio: 16 / 9; background: #070d13; overflow: hidden; }
+    :host { display: block; position: relative; direction: ltr; aspect-ratio: 16 / 9; background: #070d13; overflow: hidden; }
     canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
   `,
 })

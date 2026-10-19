@@ -23,9 +23,11 @@
       </div>
 
       <div class="status-cluster" role="status">
-        <span class="conn-pill" [attr.data-kind]="feed.state().kind">
-          <span class="live-dot"></span>{{ statusLabel() }}
-        </span>
+        @if (!simulated()) {
+          <span class="conn-pill" [attr.data-kind]="feed.state().kind">
+            <span class="live-dot"></span>{{ statusLabel() }}
+          </span>
+        }
         @if (simulated()) {
           <span class="badge badge--sim" data-testid="sim-badge"><app-icon name="cpu" [size]="12" />{{ i18n.t('simulatedFeed') }}</span>
         }

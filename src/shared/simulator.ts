@@ -150,10 +150,20 @@ export class Simulator {
   private populate(cam: CamState, initial: boolean) {
     const persons = cam.agents.filter((a) => a.cls === 'person').length;
     const vehicles = cam.agents.filter((a) => a.cls === 'vehicle').length;
-    for (let i = persons; i < cam.layout.persons; i++) cam.agents.push(this.spawnPerson(cam, initial));
-    for (let i = vehicles; i < cam.layout.vehicles; i++) {
-      const v = this.spawnVehicle(cam, initial);
-      if (v) cam.agents.push(v);
+    // Occupancy drifts slowly per camera (people arrive in waves), so charts have shape.
+    const idx = this.cams.indexOf(cam);
+    const wave = initial ? 0 : Math.sin(this.clockMs / (40_000 + idx * 9_000) + idx * 1.7);
+    const target = Math.max(1, Math.round(cam.layout.persons * (1 + 0.45 * wave)));
+    if (initial) {
+      for (let i = persons; i < target; i++) cam.agents.push(this.spawnPerson(cam, true));
+    } else if (persons < target && this.rand() < 0.08) {
+      cam.agents.push(this.spawnPerson(cam, false));
+    }
+    if (vehicles < cam.layout.vehicles && (initial || this.rand() < 0.04)) {
+      for (let i = vehicles; i < (initial ? cam.layout.vehicles : vehicles + 1); i++) {
+        const v = this.spawnVehicle(cam, initial);
+        if (v) cam.agents.push(v);
+      }
     }
   }
 
@@ -175,7 +185,7 @@ export class Simulator {
       stillMs: 0,
       ageMs: 0,
       confBias: this.r(-0.06, 0.05),
-      ttlMs: this.r(30_000, 90_000),
+      ttlMs: this.r(20_000, 60_000),
       alerted: new Set(),
     };
   }
@@ -213,7 +223,7 @@ export class Simulator {
     a.tx = this.r(rect.x0, rect.x1);
     a.ty = this.r(rect.y0, rect.y1);
     // Platform: occasionally drift to the edge (rare, yields an intrusion alert).
-    if (cam.info.scene === 'platform' && this.rand() < 0.04 * this.eventRate) a.ty = this.r(0.92, 0.97);
+    if (cam.info.scene === 'platform' && this.rand() < 0.02 * this.eventRate) a.ty = this.r(0.92, 0.97);
     // Rare: wander into a restricted zone.
     if (this.rand() < 0.035 * this.eventRate && cam.info.zones.length) {
       const poly = cam.info.zones[0].polygon;
@@ -223,7 +233,7 @@ export class Simulator {
       a.ty = cy + this.r(-0.02, 0.02);
     }
     // Loiter at the destination for a while.
-    a.waitMs = this.rand() < 0.12 * this.eventRate ? this.r(11_000, 20_000) : this.r(0, 2_500);
+    a.waitMs = this.rand() < 0.06 * this.eventRate ? this.r(11_000, 20_000) : this.r(0, 2_500);
   }
 
   private simulate(cam: CamState, dt: number, now: number, out: ServerEvent[]) {
@@ -342,7 +352,11 @@ export class Simulator {
     const typeKey = `type:${type}`;
     const typeUntil = cam.cooldown.get(typeKey);
     if (typeUntil !== undefined && typeUntil > this.clockMs) return;
-    cam.cooldown.set(typeKey, this.clockMs + 9_000);
+    // Camera-wide suppression window (critical alerts bypass it), like a real VMS rule engine.
+    const camUntil = cam.cooldown.get('cam:any');
+    if (severity !== 'critical' && camUntil !== undefined && camUntil > this.clockMs) return;
+    cam.cooldown.set('cam:any', this.clockMs + 18_000);
+    cam.cooldown.set(typeKey, this.clockMs + 15_000);
     if (cooldownMs > 0) cam.cooldown.set(key, this.clockMs + cooldownMs);
     if (cam.cooldown.size > 256) {
       for (const [k, t] of cam.cooldown) if (t <= this.clockMs) cam.cooldown.delete(k);
